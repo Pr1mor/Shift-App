@@ -11,12 +11,9 @@ class Shift:
 
 class Employee:
 
-    employees = []
-
     def __init__(self, name, role):
         self.name = name
         self.role = role
-        Employee.employees.append(self)
         self.shifts = []
 
 
