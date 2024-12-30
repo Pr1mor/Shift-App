@@ -9,21 +9,43 @@ def create_employee_file(name, role):
                 wf.write(f"{name}\n{role}\n")
 
 
+# Reads the name.txt file and creates the employee based on that name, role and shifts
 def create_employee(name):
     try:
         with open(f"{name}.txt", "r") as rf:
-            employee_name = rf.readline().strip()
-            employee_role = rf.readline().strip()
+            employee_name = rf.readline().strip() # Extracting Name
+            employee_role = rf.readline().strip() # Extracting Role
 
             employee = Employee(employee_name, employee_role)
+
+            # Extracting Shifts
+            for line in rf: 
+                shift = line.strip().split(" ")
+                employee.add_shift(shift[0], shift[1], shift[2])
             return employee
     
     except FileNotFoundError:
         print(f"{name}.txt does not exist")
     except Exception as e:
         print(f"An expection as occured {e}")
-    
-def manager_tools():
+
+
+# Only Managers can call this function
+def addingShift():
+    employee_name = input("Please tell us the name of the employee: ")
+    try:
+        with open(f"{employee_name}.txt", "a"):
+            day = ""
+            while len(day) != 3:
+                day = input("Tell us the day (only first 3 letters): ")
+
+    except FileNotFoundError:
+        print(f"The employee: {employee_name} does not exists")
+    except Exception as e:
+        print(f"An error has occured {e}")
+
+
+def manager_tools(manager):
     while True:
         print("""What would you like to do:
         1. View My Shifts
@@ -33,9 +55,9 @@ def manager_tools():
         choice = input("> ")
 
         if choice == "1":
-            pass
+            manager.display_shifts()
         elif choice == "2":
-            pass
+            addingShift()
         elif choice == "3":
             break
         else:
@@ -61,7 +83,9 @@ try:
 
     employee = create_employee(name)
     if employee.role == "Manager":
-        manager_tools()
+        manager_tools(employee)
+    elif employee.role == "Associate":
+        pass
 
     
 
