@@ -1,97 +1,57 @@
-from Employee import Employee
+import openpyxl as xl
 
-# Functions
+wb = xl.load_workbook("Employee_Workbook.xlsx")
+sheet = wb["Sheet1"]
 
-def create_employee_file(name, role):
-    with open(EMPLOYEE_LIST, "a") as af:
-            af.write(f"{name}\n")
-            with open(f"{name}.txt", "w") as wf:
-                wf.write(f"{name}\n{role}\n")
+def find_employee(sheet, name):
+      
+    for row in range(2, sheet.max_row + 1):
+       cell = sheet.cell(row, 1)
+       if(name == cell.value):
+            return row
 
-
-# Reads the name.txt file and creates the employee based on that name, role and shifts
-def create_employee(name):
-    try:
-        with open(f"{name}.txt", "r") as rf:
-            employee_name = rf.readline().strip() # Extracting Name
-            employee_role = rf.readline().strip() # Extracting Role
-
-            employee = Employee(employee_name, employee_role)
-
-            # Extracting Shifts
-            for line in rf: 
-                shift = line.strip().split(" ")
-                employee.add_shift(shift[0], shift[1], shift[2])
-            return employee
-    
-    except FileNotFoundError:
-        print(f"{name}.txt does not exist")
-    except Exception as e:
-        print(f"An expection as occured {e}")
+    return -1
 
 
-# Only Managers can call this function
-def addingShift():
-    employee_name = input("Please tell us the name of the employee: ")
-    try:
-        with open(f"{employee_name}.txt", "a"):
-            day = ""
-            while len(day) != 3:
-                day = input("Tell us the day (only first 3 letters): ")
-
-    except FileNotFoundError:
-        print(f"The employee: {employee_name} does not exists")
-    except Exception as e:
-        print(f"An error has occured {e}")
+def add_employee(name, role):
+    cell = sheet.cell(sheet.max_row + 1, 1)
+    cell.value = name
+    cell = sheet.cell(sheet.max_row, 2)
+    cell.value = role
+    print("\nWelcome to the team :)\n")
 
 
-def manager_tools(manager):
+# Main Program
+
+print("##### WELCOME TO THE SHIFT APP #####")
+name = input("Please enter your name: ")
+
+if find_employee(sheet, name) == -1:
+    print(f"{name} looks like you are new here")
+    role = input("Tell us your role: ")
+    add_employee(name, role)
+
+Employeerow = find_employee(sheet, name)
+role = sheet.cell(Employeerow, 2).value
+
+if role == "Manager":
+    # Manager tools
+    pass
+else:
+
     while True:
-        print("""What would you like to do:
-        1. View My Shifts
-        2. Add Shifts
-        3. Quit
-    """)
-        choice = input("> ")
-
+        choice = input("""\nWhat would you like to do:
+1. View my shifts
+2. Quit
+""")
+        
         if choice == "1":
-            manager.display_shifts()
+            pass # View the shift
         elif choice == "2":
-            addingShift()
-        elif choice == "3":
             break
         else:
-            print("Enter correct input!")
+            print("Enter a correct input!\n")
 
-# Main program
 
-print("\n#####    WELCOME TO SHIFT APP    #####\n")
-name = input("Please enter your name: ")
-EMPLOYEE_LIST = "Employee.txt"
 
-try:
-    with open(EMPLOYEE_LIST, "r") as f:
-        employees = set(line.strip() for line in f)
-    
-    if name in employees:
-        print(f"Welcome back {name}")
-    else:
-        print(f"You are new here {name}")
-        role = input("What is your role dear? ")
-        create_employee_file(name, role)
-        
-
-    employee = create_employee(name)
-    if employee.role == "Manager":
-        manager_tools(employee)
-    elif employee.role == "Associate":
-        pass
-
-    
-
-except FileNotFoundError:
-    print(f"{EMPLOYEE_LIST} does not exist!")
-except Exception as e:
-    print(f"An error has occured {e}") 
-
-print("\n#####    Have a Heavenly Day     #####\n")
+wb.save("Employee_Workbook.xlsx")
