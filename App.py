@@ -32,7 +32,8 @@ def view_shift(sheet, employee_row):
             print(f"{day.value:<10}: {time.value}")
 
 
-def manager_tools(sheet, Employeerow):
+
+def manager_tools(sheet):
      while True:
             choice = input("""\nWhat would you like to do:
 1. View my shifts
@@ -41,7 +42,12 @@ def manager_tools(sheet, Employeerow):
 """)
             
             if choice == "1":
-                view_shift(sheet, Employeerow)
+                employee = input("Whose shift would you like to view: ")
+                Employeerow = find_employee(sheet, employee)
+                if not Employeerow == -1:
+                    view_shift(sheet, Employeerow)
+                else:
+                    print(f"Employee named: {employee} not found!")
             elif choice == "2":
                 pass
             elif choice == "3":
@@ -78,8 +84,7 @@ Employeerow = find_employee(sheet, name)
 role = sheet.cell(Employeerow, 2).value
 
 if role == "Manager":
-    # Manager tools
-    manager_tools(sheet, Employeerow)
+    manager_tools(sheet)
 
 else:
     associate_tools(sheet, Employeerow)
