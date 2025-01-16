@@ -1,10 +1,22 @@
 import database as db
+from datetime import datetime
 
 # Only Managers can hire employee for simplicity I am starting with my myself as Manager i.e there is already 1 employee in the database
 
 
 # Functions
 
+
+# This function returns a string of the format (YYYY-MM-DD). It will keep asking until the format is correct
+def get_shift_time():
+    while True:
+        try:
+            user_input = input("Please enter the time in the format (YYYY-MM-DD HH:MM): ")
+            shift_time = datetime.strptime(user_input, "%Y-%m-%d %H:%M")
+            return shift_time
+        except ValueError:
+            print("Incorrect format. Please use the format (YYYY-MM-DD HH:MM)")
+        
 
 def manager_tools(manager_name):
     while True:
@@ -24,7 +36,14 @@ def manager_tools(manager_name):
             print()
             db.show_shifts(employee_name)
         elif userChoice == "3":
-            pass
+            employee_name = input("Enter the employee's name you want to add shift for: ")
+            print("Please enter the start time")
+            start_time = get_shift_time()
+            print("Please enter the end time")
+            end_time = get_shift_time()
+
+            db.add_shift(employee_name, start_time, end_time)
+
         elif userChoice == "4":
             pass
         elif userChoice == "5":

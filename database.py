@@ -44,13 +44,50 @@ def add_shift(name, start, end):
     id = find_employee_id(name)
 
     if id:
-        c.execute("INSERT INTO shifts (employee_id, start_shift, end_shift) VALUES (?,?,?)", (id, start, end))
+        isValid = check_shifts(id, start, end)
+        if isValid:
+
+            start_time = start.strftime("%Y-%m-%d %H:%M")
+            end_time = end.strftime("%Y-%m-%d %H:%M")
+            c.execute("INSERT INTO shifts (employee_id, start_shift, end_shift) VALUES (?,?,?)", (id, start_time,end_time))
+            print("Shift added successfully")
     else:
         print(f"Employee ({name}) not found")
 
     conn.commit()
     conn.close()
 
+
+# checks if the 2 shifts are valid or not i.e (same day, start < end and no overlapping of shifts)
+def check_shifts(id, start, end):
+
+    if start.date() != end.date():
+        print("Error: Both the start and end timings should be on the same day")
+        return False
+    
+    elif start >= end:
+        print("Error: Start time should be earlier than end time")
+        return False
+
+    else:
+        # check for overlaping of shifts
+        conn = sqlite3.connect("employee.db")
+        c = conn.cursor()
+
+        c.execute("SELECT start_shift, end_shift FROM shifts WHERE (employee_id) = (?)", (id,))
+        shifts = c.fetchall()
+        start_time = start.strftime("%Y-%m-%d %H:%M")
+        end_time = end.strftime("%Y-%m-%d %H:%M")
+        
+        for existing_start, existing_end in shifts:
+            if start_time < existing_end and end_time > existing_start:
+                print("Error: The new shift overlaps with the existing one")
+                return False
+
+        conn.commit()
+        conn.close()
+
+    return True
 
 def show_all():
     conn = sqlite3.connect("employee.db")
@@ -75,7 +112,7 @@ def show_shifts(name):
     id = find_employee_id(name)
 
     if id:
-        c.execute("SELECT start_shift, end_shift FROM shifts WHERE (employee_id) = (?)", (id,))
+        c.execute("SELECT start_shift, end_shift FROM shifts WHERE (employee_id) = (?) ORDER BY start_shift", (id,))
 
         shifts = c.fetchall()
 
@@ -141,6 +178,16 @@ def delete_all():
 
     c.execute("DROP TABLE employees")
     c.execute("DROP TABLE shifts")
+
+    conn.commit()
+    conn.close()
+
+
+def help():
+    conn = sqlite3.connect("employee.db")
+    c = conn.cursor()
+
+    c.execute("DELETE FROM shifts WHERE id = 4")
 
     conn.commit()
     conn.close()
