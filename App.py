@@ -45,7 +45,12 @@ def manager_tools(manager_name):
             db.add_shift(employee_name, start_time, end_time)
 
         elif userChoice == "4":
-            pass
+            employee_name = input("Enter the employee's name you want to remove shift for: ")
+            db.show_shifts(employee_name)
+            shift_id = input("Please enter the Shift ID for the shift you want to remove: ")
+            db.remove_shift(employee_name, shift_id)
+            db.show_shifts(employee_name)
+       
         elif userChoice == "5":
             break
         else:
@@ -54,11 +59,11 @@ def manager_tools(manager_name):
 
 def associate_tools(name):
     while True:
-        userChoice = input("""What would you like to do
+        userChoice = input("""\nWhat would you like to do
             1. View my shifts
             2. Quit
-""")
-
+\n> """)
+        print()
         if userChoice == "1":
             db.show_shifts(name)
         elif userChoice == "2":

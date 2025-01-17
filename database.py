@@ -89,6 +89,17 @@ def check_shifts(id, start, end):
 
     return True
 
+
+def remove_shift(name, shift_id):
+    conn = sqlite3.connect("employee.db")
+    c = conn.cursor()
+
+    employee_id = find_employee_id(name)
+    c.execute("DELETE FROM shifts WHERE (employee_id, id) = (?,?)", (employee_id, shift_id,))
+
+    conn.commit()
+    conn.close()
+
 def show_all():
     conn = sqlite3.connect("employee.db")
     c = conn.cursor()
@@ -112,12 +123,12 @@ def show_shifts(name):
     id = find_employee_id(name)
 
     if id:
-        c.execute("SELECT start_shift, end_shift FROM shifts WHERE (employee_id) = (?) ORDER BY start_shift", (id,))
+        c.execute("SELECT id, start_shift, end_shift FROM shifts WHERE (employee_id) = (?) ORDER BY start_shift", (id,))
 
         shifts = c.fetchall()
 
-        print(f"Showing shifts for Employee {id} ({name})")
-        print("Date\t\tStart\t\tEnd")
+        print(f"Showing shifts for Employee {id} ({name})\n")
+        print("Shift ID\tDate\t\tStart\t\tEnd")
         for shift in shifts:
             format_shift(shift)
 
@@ -130,14 +141,14 @@ def show_shifts(name):
 
 def format_shift(shift_tuple):
 
-    start_time = datetime.strptime(shift_tuple[0], "%Y-%m-%d %H:%M") # 2025-01-01 08:00
-    end_time = datetime.strptime(shift_tuple[1], "%Y-%m-%d %H:%M")   # 2025-01-01 15:00
+    start_time = datetime.strptime(shift_tuple[1], "%Y-%m-%d %H:%M") # 2025-01-01 08:00
+    end_time = datetime.strptime(shift_tuple[2], "%Y-%m-%d %H:%M")   # 2025-01-01 15:00
 
     date = start_time.strftime("%Y-%m-%d") # 2025-01-01
     start_time = start_time.strftime("%H:%M") # 08:00
     end_time = end_time.strftime("%H:%M")   # 15:00
 
-    print(f"{date}\t{start_time}\t\t{end_time}")
+    print(f"{shift_tuple[0]}\t\t{date}\t{start_time}\t\t{end_time}")
 
 
 def find_employee_id(name):
